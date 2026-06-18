@@ -1,97 +1,59 @@
-/* ======================================================================================================
-   
-   Usina Info & WR Kits
-   
-   RTC DS3231
+#include <Wire.h>
+#include <RTClib.h> //by Adafruit
 
-   Hardware
-            DS3231    -> Arduino UNO
-            -----------------------------------------
-            VCC pin   -> Analógico 3 (utilizado como digital 17)
-            GND pin   -> Analógico 3 (utilizado como digital 16)
-            SDA pin   -> Analógico 4 (SDA)  
-            SCL pin   -> Analógico 5 (SCL)  
-            -----------------------------------------
-    
-   Autor: Eng. Wagner Rambo  Data: Novembro de 2016
-   
-   www.wrkits.com.br | facebook.com/wrkits | youtube.com/user/canalwrkits
-   
-====================================================================================================== */
+RTC_DS3231 rtc;
 
+// Alimentação do módulo
+const int RTC_GND = A2;
+const int RTC_VCC = A3;
 
-// ======================================================================================================
-// --- Bibliotecas Auxiliares ---
-#include <DS3231.h>          //Inclui a biblioteca do DS3231 Shield
+#define AJUSTAR_RELOGIO true
 
+void setup() {
+  // Alimentação do módulo RTC
+  pinMode(RTC_GND, OUTPUT);
+  pinMode(RTC_VCC, OUTPUT);
 
-// ======================================================================================================
-// --- Mapeamento de Hardware ---
-#define    vcc    17
-#define    gnd    16
+  digitalWrite(RTC_GND, LOW);   // GND
+  digitalWrite(RTC_VCC, HIGH);  // +5V
 
+  delay(100); // aguarda estabilização
 
-// ======================================================================================================
-// --- Declaração de Objetos ---
-DS3231  rtc(SDA, SCL);
-Time t;
-int horas, ano;
+  Serial.begin(115200);
+  Wire.begin();
 
+  if (!rtc.begin()) {
+    Serial.println("Erro: DS3231 nao encontrado!");
+    while (1);
+  }
 
-// ======================================================================================================
-// --- Configurações Iniciais ---
-void setup()
-{
+  if (AJUSTAR_RELOGIO) {
+    rtc.adjust(DateTime(2026, 6, 18, 11, 11, 0));
+    Serial.println("Relogio ajustado.");
+  }
+}
 
-  pinMode(vcc, OUTPUT);
-  pinMode(gnd, OUTPUT);
-  digitalWrite(vcc, HIGH);
-  digitalWrite(gnd,  LOW);
- 
-  Serial.begin(115200);          //Inicia comunicações Serial em 115200 baud rate
- 
-  rtc.begin();                   //Inicializa RTC
-  
-  //Descomente as linhas a seguir para configurar o horário, após comente e faça o upload novamente para o Arduino
-  //rtc.setDOW(WEDNESDAY);     // Set Day-of-Week to SUNDAY
-//  rtc.setTime(11,43, 0);     // Set the time to 12:00:00 (24hr format)
-//  rtc.setDate(25,7,2020);
+void loop() {
+  DateTime now = rtc.now();
 
-} //end setup
+  Serial.print(now.day());
+  Serial.print('/');
+  Serial.print(now.month());
+  Serial.print('/');
+  Serial.print(now.year());
 
-
-// ======================================================================================================
-// --- Loop Infinito ---
-void loop()
-{
-  t = rtc.getTime();
-  horas = t.hour;
-  ano   = t.year;
-  Serial.print(horas);
-  Serial.print("   ");
-  Serial.print(ano);
-  Serial.print("   ");
-  //Imprime o dia da semana
-  //Serial.print(rtc.getDOWStr());
-  Serial.print(rtc.getDateStr());
-  Serial.print(" ");
-  Serial.print(" -- ");
   Serial.print(" ");
 
-  //Imprime o horário
-  Serial.println(rtc.getTimeStr());
-  
-  //Atualiza monitor a cada segundo
-  delay (1000);
-  
-} //end loop
+  if (now.hour() < 10) Serial.print('0');
+  Serial.print(now.hour());
+  Serial.print(':');
 
+  if (now.minute() < 10) Serial.print('0');
+  Serial.print(now.minute());
+  Serial.print(':');
 
+  if (now.second() < 10) Serial.print('0');
+  Serial.println(now.second());
 
-
-
-
-
-
-
-
+  delay(1000);
+}
