@@ -2,6 +2,8 @@
 
 ModbusMaster node;
 
+bool serPrint = false;
+
 void setup() {
 
   Serial.begin(115200);      // Monitor Serial USB
@@ -30,25 +32,35 @@ void loop() {
     uint16_t ec =
       node.getResponseBuffer(2);
 
-    Serial.print("Umidade: ");
-    Serial.print(umidade);
-    Serial.println(" %");
+    if (serPrint){
+      Serial.print("Umidade: ");
+      Serial.print(umidade);
+      Serial.println(" %");
+  
+      Serial.print("Temperatura: ");
+      Serial.print(temperatura);
+      Serial.println(" C");
+  
+      Serial.print("EC: ");
+      Serial.print(ec);
+      Serial.println(" uS/cm");
 
-    Serial.print("Temperatura: ");
-    Serial.print(temperatura);
-    Serial.println(" C");
-
-    Serial.print("EC: ");
-    Serial.print(ec);
-    Serial.println(" uS/cm");
-
-    Serial.println("-------------------");
+      Serial.println("-------------------");
+    }
+    else{
+      Serial.println(umidade* 100);
+    }
   }
   else {
 
-    Serial.print("Erro Modbus: ");
-    Serial.println(result);
+    if (serPrint){
+      Serial.print("Erro Modbus: ");
+      Serial.println(result);
+    }
+    else{
+      Serial.println(-1);   // valor de erro visível
+    }
   }
 
-  delay(2000);
+  delay(500);
 }
