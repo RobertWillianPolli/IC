@@ -3,20 +3,13 @@
 
 Adafruit_SHT4x sht4 = Adafruit_SHT4x();
 
-void setup() {
-  Serial.begin(115200);
-
-  while (!Serial) {
-    delay(10);
-  }
+void shtsetup() {
 
   Serial.println("Inicializando SHT40...");
 
   if (!sht4.begin()) {
     Serial.println("Sensor SHT40 nao encontrado!");
-    while (1) {
-      delay(10);
-    }
+    return;
   }
 
   Serial.println("SHT40 encontrado!");
@@ -28,25 +21,23 @@ void setup() {
   sht4.setHeater(SHT4X_NO_HEATER);
 }
 
-void loop() {
+float sthread(bool temp, bool humd) {
 
-  sensors_event_t humidity, temp;
+  sensors_event_t humidity, temperature;
 
-  if (!sht4.getEvent(&humidity, &temp)) {
+  if (!sht4.getEvent(&humidity, &temperature)) {
     Serial.println("Erro de leitura");
-    delay(1000);
-    return;
+    return -1;
   }
 
-  Serial.print("Temperatura: ");
-  Serial.print(temp.temperature);
-  Serial.println(" °C");
+  if(temp){
+    return temperature.temperature;
+  }
+  else if(humd){
+    return humidity.relative_humidity;
+  }
 
-  Serial.print("Umidade: ");
-  Serial.print(humidity.relative_humidity);
-  Serial.println(" %");
-
-  Serial.println();
-
-  delay(1000);
+  else{
+    return -1;
+  }
 }

@@ -2,45 +2,28 @@
 
 const int SENSOR_AO  = A0;  // saída analógica
 const int SENSOR_DO  = A1;  // saída digital
-
-const int SENSOR_GND = A2;  // alimentação GND
-const int SENSOR_VCC = A3;  // alimentação +5V
-
 bool serPrint = false;
 
-void setup() {
-  // Alimentação do sensor
-  pinMode(SENSOR_GND, OUTPUT);
-  pinMode(SENSOR_VCC, OUTPUT);
+void hdsetup(void);
+float hdread(bool converted);
 
-  digitalWrite(SENSOR_GND, LOW);
-  digitalWrite(SENSOR_VCC, HIGH);
+void hdsetup(void) {
 
   // Entradas do sensor
   pinMode(SENSOR_DO, INPUT);
-
-  Serial.begin(115200);
-
-  delay(500); // estabilização da alimentação
 }
 
-void loop() {
+float hdread(bool converted) {
   int leitura = analogRead(SENSOR_AO);
 
   // Converte para porcentagem aproximada -- Pensar na calibração
   int umidade = map(leitura, 1024, 0, 0, 100); // (xx, medida seca, medida molhada, xx)
 
-
-  if (serPrint){
-    Serial.print("ADC: ");
-    Serial.print(leitura);
-
-    Serial.print(" | Umidade: ");
-    Serial.print(umidade);
-    Serial.println("%");
+  if (converted){
+    return umidade;
   }
   else{
-    Serial.println(umidade);
+    return leitura;
   }
-  delay(500);
+
 }

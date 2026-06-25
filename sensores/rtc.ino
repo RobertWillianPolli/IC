@@ -1,59 +1,40 @@
+// Real-Time Clock
+
 #include <Wire.h>
 #include <RTClib.h> //by Adafruit
 
-RTC_DS3231 rtc;
-
-// Alimentação do módulo
-const int RTC_GND = A2;
-const int RTC_VCC = A3;
-
 #define AJUSTAR_RELOGIO true
 
-void setup() {
-  // Alimentação do módulo RTC
-  pinMode(RTC_GND, OUTPUT);
-  pinMode(RTC_VCC, OUTPUT);
+RTC_DS3231 rtc;
 
-  digitalWrite(RTC_GND, LOW);   // GND
-  digitalWrite(RTC_VCC, HIGH);  // +5V
+char date[20];
 
-  delay(100); // aguarda estabilização
+void rtcinit(void) {
 
-  Serial.begin(115200);
   Wire.begin();
 
   if (!rtc.begin()) {
     Serial.println("Erro: DS3231 nao encontrado!");
     while (1);
   }
-
-  if (AJUSTAR_RELOGIO) {
-    rtc.adjust(DateTime(2026, 6, 18, 11, 11, 0));
-    Serial.println("Relogio ajustado.");
-  }
 }
 
-void loop() {
+void rtcset(int ano, int mes, int dia, int hora, int minuto, int seg){
+  rtc.adjust(DateTime(ano, mes, dia, hora, minuto, seg));
+  Serial.println("Relogio ajustado.");
+}
+
+char* rtcnow(void) {
   DateTime now = rtc.now();
 
-  Serial.print(now.day());
-  Serial.print('/');
-  Serial.print(now.month());
-  Serial.print('/');
-  Serial.print(now.year());
-
-  Serial.print(" ");
-
-  if (now.hour() < 10) Serial.print('0');
-  Serial.print(now.hour());
-  Serial.print(':');
-
-  if (now.minute() < 10) Serial.print('0');
-  Serial.print(now.minute());
-  Serial.print(':');
-
-  if (now.second() < 10) Serial.print('0');
-  Serial.println(now.second());
-
-  delay(1000);
+  sprintf(date,
+          "%02d/%02d/%04d,%02d:%02d:%02d",
+          now.day(),
+          now.month(),
+          now.year(),
+          now.hour(),
+          now.minute(),
+          now.second());
+          
+  return date;
 }

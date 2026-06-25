@@ -1,19 +1,17 @@
+// Controle do SD card
+
 #include "SD.h"
 #include "SPI.h"
 
 const int pinoSS = 10;
 int dados = 0;
 
-void setup() {
-  // put your setup code here, to run once:
-  pinMode(pinoSS, OUTPUT); // Declara pinoSS como saída
+void sdsetup(void) {
   
-  digitalWrite(pinoSS, HIGH);     // Coloca o pino seletor em nível alto
-  
-  delay(100); // aguarda estabilização
+  pinMode(pinoSS, OUTPUT);    // Declara pinoSS como saída  
+  digitalWrite(pinoSS, HIGH); // Coloca o pino seletor em nível alto
 
-  Serial.begin(9600);
-  delay(2000); 
+  delay(1000); 
 
   if (!SD.begin(pinoSS)) {
     Serial.println("Falha no cartão SD");
@@ -22,17 +20,29 @@ void setup() {
   else{
     Serial.println("SD pronto para o uso");
   }
+  return;
 }
 
-void loop() {
-  File arquivo = SD.open("medidas.txt", FILE_WRITE);
-
-  dados += 1;
+void sd_write(String file, String data) { // Salva uma string
+  File arquivo = SD.open(file, FILE_WRITE);
 
   if (arquivo){
-    arquivo.println(dados);
+    arquivo.println(data);
     arquivo.close();
-    Serial.println(dados);
   }
-  delay(5000);
+  return;
+}
+
+void sd_buffer(String filename, int bufferIndex, String buffer[]){  // Salva um buffer de dados
+  File file = SD.open(filename, FILE_WRITE);
+
+  if (file) {
+    for (int i = 0; i < bufferIndex; i++) {
+      file.println(buffer[i]);
+    }
+    file.close();
+    bufferIndex = 0;
+  } else {
+    Serial.println("Erro ao abrir SD");
+  }
 }
