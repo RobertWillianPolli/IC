@@ -4,9 +4,6 @@ const int SENSOR_AO  = A0;  // saída analógica
 const int SENSOR_DO  = A1;  // saída digital
 bool serPrint = false;
 
-void hdsetup(void);
-float hdread(bool converted);
-
 void hdsetup(void) {
 
   // Entradas do sensor

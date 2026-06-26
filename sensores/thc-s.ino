@@ -22,6 +22,9 @@ float thc_temp(){
     temperature = ((int16_t)node.getResponseBuffer(1)) / 10.0;
     return temperature;
   }
+  else{
+    return -1;
+  }
 }
 
 float thc_humid(){
@@ -31,6 +34,9 @@ float thc_humid(){
     humidity = node.getResponseBuffer(0) / 10.0;  
     return humidity;
   }
+  else{
+    return -1;
+  }
 }
 
 uint16_t thc_ec(){
@@ -39,5 +45,8 @@ uint16_t thc_ec(){
   if (result == node.ku8MBSuccess) {
     ec = node.getResponseBuffer(2);
       return ec;
+  }
+  else{
+    return -1;
   }
 }

@@ -23,7 +23,7 @@ void setup() {
 
   Serial.begin(115200);
   sdsetup();
-  hdsetup();
+  thcsetup();
   rtcinit();
 
   // Cabeçalho CSV
@@ -32,7 +32,7 @@ void setup() {
 
 void loop() {
  
-  umidade = hdread(true);
+  umidade = thc_humid();
   
   Serial.println(umidade);
   

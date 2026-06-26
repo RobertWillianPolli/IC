@@ -41,7 +41,6 @@ void sd_buffer(String filename, int bufferIndex, String buffer[]){  // Salva um 
       file.println(buffer[i]);
     }
     file.close();
-    bufferIndex = 0;
   } else {
     Serial.println("Erro ao abrir SD");
   }
