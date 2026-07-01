@@ -1,14 +1,10 @@
-// HD-38
+// HW-390
 
-void hdsetup(void) {
-  const int SENSOR_DO  = A1;  // saída digital
-  
+void hwsetup(void) {  
   // Entradas do sensor
-  pinMode(SENSOR_DO, INPUT);
 }
 
-float hdread(bool converted) {
-
+float hwread(bool converted) {
   const int SENSOR_AO  = A0;  // saída analógica
   
   int leitura = analogRead(SENSOR_AO);
@@ -22,5 +18,4 @@ float hdread(bool converted) {
   else{
     return leitura;
   }
-
 }
