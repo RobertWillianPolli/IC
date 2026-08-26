@@ -31,7 +31,8 @@ void setup() {
 }
 
 void loop() {
- 
+  thcsetaddr(1);
+  
   umidade = thc_humid();
   
   Serial.println(umidade);
