@@ -8,11 +8,14 @@ float humidity;
 uint16_t ec;
 
 void thcsetup() {
-
   Serial1.begin(4800);       // THC-S RS485
-  node.begin(1, Serial1);    // Endereço Modbus = 1
-
   Serial.println("THC-S iniciado");
+}
+
+void thcsetaddr(int addr){
+  node.begin(addr, Serial1);
+  Serial.println("Leitura do sensor de end.:");
+  Serial.println(addr);
 }
 
 float thc_temp(){
