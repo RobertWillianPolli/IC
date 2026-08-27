@@ -5,7 +5,7 @@
 
 #define AJUSTAR_RELOGIO true
 
-RTC_DS3231 rtc;
+RTC_DS1307 rtc;
 
 char date[20];
 
