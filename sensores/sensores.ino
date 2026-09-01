@@ -5,41 +5,64 @@ String buffer[BUFFER_SIZE];
 int bufferIndex = 0;
 
 char linhaCSV[100];
+char umidades[50];
 
-float umidade = 0;
+float umidade[4];
 
-// Alimentação do módulo rtc
-  const int RTC_GND = A2;
-  const int RTC_VCC = A3;
+//Pinos de controle dos relés
+// RELAY_1 = 4
+// RELAY_2 = 5
+// RELAY_3 = 6
+// RELAY_4 = 7
 
 void setup() {
 
-  // Alimentação do módulo RTC
-  pinMode(RTC_GND, OUTPUT);
-  pinMode(RTC_VCC, OUTPUT);
-
-  digitalWrite(RTC_GND, LOW);   // GND
-  digitalWrite(RTC_VCC, HIGH);  // +5V
-
   Serial.begin(115200);
   sdsetup();
-  hwsetup();
+  thcsetup();
   rtcinit();
 
+  rtcset(2026,8,27,11,0,0);
+
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+
+  digitalWrite(4, LOW);
+  digitalWrite(5, LOW);
+  digitalWrite(6, LOW);
+  digitalWrite(7, LOW);
+  
   // Cabeçalho CSV
-  sd_write("log.csv", "data,hora,umidade_%");
+  sd_write("log.csv", "data,hora,umidade_%_1,umidade_%_2,umidade_%_3,umidade_%_4");
 }
 
 void loop() {
- 
-  umidade = hwread(true);
+
+  for (int i=4;i<8;i++){
+    digitalWrite(i, HIGH);
+    umidade[i-4] = thc_humid(i-3);
+    delay(500);
+    digitalWrite(i, LOW);
+  }
+
+  snprintf(umidades, sizeof(umidades),
+         "Umidades: %.2f %, %.2f %, %.2f %, %.2f %",
+         umidade[0],
+         umidade[1],
+         umidade[2],
+         umidade[3]);
   
-  Serial.println(umidade);
+  Serial.println(umidades);
   
   sprintf(linhaCSV,
-          "%s,%.02f",
+          "%s,%.02f,%.02f,%.02f,%.02f",
           rtcnow(),
-          umidade);
+          umidade[0],
+          umidade[1],
+          umidade[2],
+          umidade[3]);
   
   // buffer
   buffer[bufferIndex++] = String(linhaCSV);
