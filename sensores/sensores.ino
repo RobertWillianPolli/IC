@@ -8,6 +8,7 @@ char linhaCSV[100];
 char umidades[50];
 
 float umidade[4];
+bool sensoresConectados[4];
 
 //Pinos de controle dos relés
 // RELAY_1 = 4
@@ -24,27 +25,36 @@ void setup() {
 
   rtcset(2026,8,27,11,0,0);
 
-  pinMode(4, OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-
-  digitalWrite(4, LOW);
-  digitalWrite(5, LOW);
-  digitalWrite(6, LOW);
-  digitalWrite(7, LOW);
+  for (int pin=4;pin<8;pin++){
+    pinMode(pin, OUTPUT);
+    digitalWrite(pin, HIGH);
+  }
   
   // Cabeçalho CSV
   sd_write("log.csv", "data,hora,umidade_%_1,umidade_%_2,umidade_%_3,umidade_%_4");
+  descobreSensores();
+}
+
+void descobreSensores(){
+  for (int pin=4;pin<8;pin++){
+    digitalWrite(pin, LOW);
+
+    sensoresConectados[pin-4] = !(thc_humid(pin-3) == -1);
+    
+    delay(500);
+    digitalWrite(pin, HIGH);
+  }
 }
 
 void loop() {
 
-  for (int i=4;i<8;i++){
-    digitalWrite(i, HIGH);
-    umidade[i-4] = thc_humid(i-3);
-    delay(500);
-    digitalWrite(i, LOW);
+  for (int pin=4;pin<8;pin++){
+    if (sensoresConectados[pin-4]){
+      digitalWrite(pin, LOW);
+      umidade[pin-4] = thc_humid(pin-3);
+      delay(500);
+      digitalWrite(pin, HIGH);
+    }
   }
 
   snprintf(umidades, sizeof(umidades),
