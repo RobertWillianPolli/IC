@@ -38,9 +38,8 @@ void setup() {
 void descobreSensores(){
   for (int pin=4;pin<8;pin++){
     digitalWrite(pin, LOW);
-
+    delay(1000);
     sensoresConectados[pin-4] = !(thc_humid(pin-3) == -1);
-    
     delay(500);
     digitalWrite(pin, HIGH);
   }
@@ -51,20 +50,23 @@ void loop() {
   for (int pin=4;pin<8;pin++){
     if (sensoresConectados[pin-4]){
       digitalWrite(pin, LOW);
+      delay(1000);
       umidade[pin-4] = thc_humid(pin-3);
       delay(500);
       digitalWrite(pin, HIGH);
     }
   }
 
-  snprintf(umidades, sizeof(umidades),
-         "Umidades: %.2f %, %.2f %, %.2f %, %.2f %",
+  if (Serial) {
+    snprintf(umidades, sizeof(umidades),
+         "Umidades: %.2f%%, %.2f%%, %.2f%%, %.2f%%",
          umidade[0],
          umidade[1],
          umidade[2],
          umidade[3]);
-  
-  Serial.println(umidades);
+
+    Serial.println(umidades);
+  }
   
   sprintf(linhaCSV,
           "%s,%.02f,%.02f,%.02f,%.02f",
