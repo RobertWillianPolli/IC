@@ -73,5 +73,5 @@ void loop() {
     bufferIndex = 0;
   }
 
-  delay(1000);
+  delay(60000);
 }
